@@ -12,7 +12,7 @@
 # License: MIT                                                                              #
 # --------------------------------------- [ Enjoy ] --------------------------------------- #
 
-import threading, socket, os
+import threading, socket, os, time
 
 
 def scanport(port):
@@ -22,7 +22,7 @@ def scanport(port):
 
         if s.connect_ex((target, port)) == 0:
             portlist.append(port)
-            print(f"Port {port} is open." + "\t")
+            print(f"Port {port} is open." + "\t" * 10)
 
         print(f"Current port: {port}" + "\t", end="\r")
         s.close()
@@ -35,7 +35,12 @@ if __name__ == "__main__":
     portlist, target, finish = [], "google.com", 0
 
     threads = [threading.Thread(target=scanport, kwargs={'port': i}) for i in range(1, 65535+1)]
-    [t.start() for t in threads]
+    threads[0].start
+    threads[0].join
+    del threads[0]
+    
+    for t in threads:
+        t.start()
+        time.sleep(0.05)
     [t.join() for t in threads]
-
-    input(sorted(portlist))
+    input(str(sorted(portlist)) + "\t" * 10)
